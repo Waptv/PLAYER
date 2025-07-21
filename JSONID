@@ -1,0 +1,77 @@
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">      
+
+
+
+
+    <div class="container">
+        <div id="player" allowfullscreen  scrolling="no" ></div>
+        <div class="video-wrapper" id="videoWrapper">
+            <iframe id="videoIframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen scrolling="no" ></iframe>
+        </div>
+ 
+  
+  
+  
+</div>
+<style>
+
+body{width:100%;height:100%;margin:0} 
+
+iframe{width:100%;height:100%;overflow:hidden;background-color:#000;position: absolute;}
+
+
+
+</style>
+        
+  
+
+
+    <script>
+        // Function to get URL parameter by name
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Function to initialize the video player
+        function initializePlayer(videoData) {
+            const videoLink = videoData.adfree_url;
+            document.getElementById('player').style.display = 'none';
+            const videoWrapper = document.getElementById('videoWrapper');
+            const videoIframe = document.getElementById('videoIframe');
+
+            const m3u8PlayerUrl = "https://anym3u8player.com/tv/p.php?url="+ encodeURIComponent(videoLink);
+
+            // Display the iframe with the external M3U8 player
+            videoIframe.src = m3u8PlayerUrl;
+            videoIframe.style.display = 'block';
+        }
+
+    // Fetch and load video data from JSON
+    const matchId = getUrlParameter('id');
+    const xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                const data = JSON.parse(xhr.responseText);
+                const videoData = data.matches.find(match => match.match_id == matchId);
+                if (videoData) {
+                    initializePlayer(videoData);
+                } else {
+                    console.error('Video data not found for ID: ' + matchId);
+                }
+            } else {
+                console.error('Failed to load video data. Status code: ' + xhr.status);
+            }
+        }
+    };
+    xhr.open('GET', 'https://raw.githubusercontent.com/drmlive/fancode-live-events/main/fancode.json', true);
+    xhr.send();
+</script>
+
+
+
